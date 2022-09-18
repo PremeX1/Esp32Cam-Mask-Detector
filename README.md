@@ -14,7 +14,7 @@ can use usb ttl to upload code or other devices.
     3. upload source code from Arduino Camera Devices folder into esp32cam.
     4. get ip and settings in Mask Detection Python and run it.
 
-I'm Not Good in English. because I'm from 
+I'm Not Good in English. because I'm Thai
 
 ## License
 [![MIT License](https://img.shields.io/badge/License-MIT-green.svg)](https://choosealicense.com/licenses/mit/)

@@ -7,17 +7,17 @@ from imutils.video import VideoStream
 import websocket
 from datetime import datetime
 
-now = datetime.now()
-
 # arduino = serial.Serial(port='COM5', baudrate=115200)
 
 model = load_model('./train_model/keras_model.h5')
 face_cascade=cv2.CascadeClassifier("detech\haarcascade_frontalface_alt.xml")
 
 ws = websocket.WebSocket()
-ws.connect("ws://192.168.137.241:81")
+ws.connect("ws://192.168.137.85:81")
 
 while True:
+	now = datetime.now()
+	no_mask_people = False
 	cap_time = now.strftime("%d-%m-%Y-%H-%M-%S")
 	#test image
 	# frame = cv2.imread("./Test.png")
@@ -25,13 +25,13 @@ while True:
 
 	resp = ws.recv()
 	decoded = cv2.imdecode(np.frombuffer(resp, np.uint8), -1)
-	frame = decoded
+	frame = cv2.flip(decoded, 0)
 	img = frame
-	frame = vs.read() 
-	imgResponse=urllib.request.urlopen(url)
-	imgnp=np.array(bytearray(imgResponse.read()),dtype=np.uint8)
-	img=cv2.imdecode(imgnp,-1)
-	r, frame = stream.read()
+	# frame = vs.read() 
+	# imgResponse=urllib.request.urlopen(url)
+	# imgnp=np.array(bytearray(imgResponse.read()),dtype=np.uint8)
+	# img=cv2.imdecode(imgnp,-1)
+	# r, frame = stream.read()
 	
 	image_grey = cv2.cvtColor(frame, cv2.COLOR_BGR2GRAY)
 
@@ -70,7 +70,6 @@ while True:
 			no_mask_people = False
 		else:
 			color = (0, 0, 255)
-			cv2.imwrite(f'./no_mask/{cap_time}.png',faces)
 			ws.send('BEEP')
 			no_mask_people = True
 		img=cv2.rectangle(img,(x,y),(x+w,y+h),color,3)
@@ -79,15 +78,15 @@ while True:
 	cv2.imshow("WebCam [1][Release] Windows Frame", Frame_Size)
 	cv2.imshow("WebCam [0] Bit Grey Frame", image_grey)
 	if(no_mask_people): 
-		cv2.imwrite(f'{cap_time}.png',frame)
+		cv2.imwrite(f'./no_mask/{cap_time}.png',Frame_Size)
 		pass
 	else:
 		pass
 	if cv2.waitKey(1) == ord('q'):
 		break
 	if(cv2.waitKey(1) == ord('f')):
-		# ws.send('F-ON')
+		ws.send('F-ON')
 		pass
 	if(cv2.waitKey(1) == 27):
-		# ws.send('F-OFF')
+		ws.send('F-OFF')
 		pass
